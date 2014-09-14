@@ -3,6 +3,7 @@ package render;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -16,6 +17,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.PixelFormat;
+import org.lwjgl.util.glu.GLU;
 
 public class renderer {
 	private  final int WIDTH = 800;
@@ -36,7 +38,7 @@ public class renderer {
 		
 	while(!Display.isCloseRequested()){
 		
-		GL11.glClearColor(0.6f,0.6f,0.6f,0);
+		
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 		GL20.glUseProgram(shaderProg);
 		GL30.glBindVertexArray(vaoId);
@@ -53,7 +55,6 @@ public class renderer {
 		Display.sync(fps);
 		Display.update();
 	}
-	//shader.clearShaders();
 	
 	Display.destroy();
 }
@@ -69,7 +70,7 @@ try {
 	e.printStackTrace();//do something more usefull here.
 	System.exit(-1);
 }
-GL11.glClearColor(0.4f, 0.6f, 0.9f, 0f);
+GL11.glClearColor(0.6f,0.6f,0.6f,0);
 GL11.glViewport(0,0,Display.getWidth(),Display.getHeight());
 
 }
@@ -97,14 +98,15 @@ FloatBuffer cBuffer = BufferUtils.createFloatBuffer(colors.length);
 cBuffer.put(colors);
 cBuffer.flip();
 
-int[] indices = {
-		0,1,3,
+byte[] indices = {
+		0,1,2,
 		2,3,0
 };
-IntBuffer iBuffer = BufferUtils.createIntBuffer(indices.length);
+ByteBuffer iBuffer = BufferUtils.createByteBuffer(indices.length);
 iBuffer.put(indices);
 iBuffer.flip();
 iCount = indices.length;
+
 vaoId = GL30.glGenVertexArrays();
 GL30.glBindVertexArray(vaoId);
 
@@ -119,6 +121,7 @@ GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbocId);
 GL15.glBufferData(GL15.GL_ARRAY_BUFFER, cBuffer, GL15.GL_STATIC_DRAW);
 GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0);
 GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
 GL30.glBindVertexArray(0);
 
 vboiId = GL15.glGenBuffers();
@@ -128,6 +131,7 @@ GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 public void intitShaders(){
+	int errorCheckValue = GL11.glGetError();
 	vShaderID = parseShaderFile(vertexFile, GL20.GL_VERTEX_SHADER);
 	fShaderID = parseShaderFile(fragmentFile, GL20.GL_FRAGMENT_SHADER);
 	shaderProg = GL20.glCreateProgram();
@@ -137,6 +141,11 @@ public void intitShaders(){
 	GL20.glBindAttribLocation(shaderProg, 1, "in_Color");
 	GL20.glLinkProgram(shaderProg);
 	GL20.glValidateProgram(shaderProg);
+	errorCheckValue = GL11.glGetError();
+	if (errorCheckValue != GL11.GL_NO_ERROR) {
+		System.out.println("ERROR - Could not create the shaders:" + GLU.gluErrorString(errorCheckValue));
+		System.exit(-1);
+	}
 }
 
 public int parseShaderFile(String file, int type){
@@ -170,6 +179,5 @@ public int parseShaderFile(String file, int type){
 	System.out.println("..Done.");
 	return shaderID;
 }
-
 
 }
