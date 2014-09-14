@@ -12,12 +12,14 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.PixelFormat;
+
+
 import render.Renderer;
 import render.StupidShader;
 
 public class DisplayLogic {
-	private static final int WIDTH = 320;
-	private static final int HEIGHT = 200;
+	private static final int WIDTH = 800;
+	private static final int HEIGHT = 600;
 	private static final int fps = 60;
 	
 	public static void main(String[] args) {
@@ -45,8 +47,7 @@ public class DisplayLogic {
 				0,1,3,
 				2,3,0
 		};
-		//todo idices buffer
-		
+		//todo idices bu
 		
 		
 		int vaoId = GL30.glGenVertexArrays();
@@ -68,7 +69,7 @@ public class DisplayLogic {
 			Display.sync(fps);
 			Display.update();
 		}
-		//shader.clearShaders();
+		shader.clearShaders();
 		
 		Display.destroy();
 	}

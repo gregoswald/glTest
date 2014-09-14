@@ -37,10 +37,6 @@ public abstract class Shader {
 		GL20.glDeleteShader(vShaderID);
 		GL20.glDeleteProgram(shaderProgram);
 	}
-	
-	protected void bindAttribute(int attribute, String variableName){
-		GL20.glBindAttribLocation(shaderProgram, attribute, variableName);
-	}
 	private static int parseShaderFile(String file, int type){
 		StringBuilder shader = new StringBuilder();
 		try {
