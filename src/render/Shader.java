@@ -8,17 +8,21 @@ import java.io.IOException;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-public abstract class Shader {
+public class Shader {
+	private static final String vertexFile = "src/shaders/VertexShader.glsl";
+	private static final String fragmentFile = "src/shaders/FragmentShader.glsl";
 	private int shaderProgram;
 	private int vShaderID;
 	private int fShaderID;
-	public Shader(String vFile, String fFile){
-		vShaderID = parseShaderFile(vFile, GL20.GL_VERTEX_SHADER);
-		fShaderID = parseShaderFile(fFile, GL20.GL_FRAGMENT_SHADER);
+	
+	public Shader(){
+		vShaderID = parseShaderFile(vertexFile, GL20.GL_VERTEX_SHADER);
+		fShaderID = parseShaderFile(fragmentFile, GL20.GL_FRAGMENT_SHADER);
 		shaderProgram = GL20.glCreateProgram();
 		GL20.glAttachShader(shaderProgram, vShaderID);
 		GL20.glAttachShader(shaderProgram, fShaderID);
-		GL20.glBindAttribLocation(shaderProgram, 0, "in_position");
+		GL20.glBindAttribLocation(shaderProgram, 0, "in_Position");
+		GL20.glBindAttribLocation(shaderProgram, 1, "in_Color");
 		GL20.glLinkProgram(shaderProgram);
 		GL20.glValidateProgram(shaderProgram);
 	}
@@ -38,15 +42,17 @@ public abstract class Shader {
 		GL20.glDeleteProgram(shaderProgram);
 	}
 	private static int parseShaderFile(String file, int type){
-		StringBuilder shader = new StringBuilder();
+		StringBuilder sCode = new StringBuilder();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String nextLine;
 			while((nextLine = reader.readLine())!=null){
-				shader.append(nextLine).append("\n");
+				sCode.append(nextLine).append("\n");
 			}
 		reader.close();
+		
 		} 
+		
 		catch (IOException e) {
 			e.printStackTrace();//TODO do something more usefull here
 		}
@@ -57,7 +63,8 @@ public abstract class Shader {
 		else{
 			System.out.println("Compiling Vertex Shader..");
 		}
-		GL20.glShaderSource(shaderID, shader);
+		System.out.print(sCode);
+		GL20.glShaderSource(shaderID, sCode);
 		GL20.glCompileShader(shaderID);
 		if(GL20.glGetShaderi(shaderID,GL20.GL_COMPILE_STATUS)==GL11.GL_FALSE){
 			System.out.println(GL20.glGetShaderInfoLog(shaderID, 500));
@@ -66,5 +73,11 @@ public abstract class Shader {
 		System.out.println("..Done.");
 		return shaderID;
 	}
+
+	public int shaderProg() {
+		return shaderProgram;
+	}
+
+	
 	
 }
